@@ -1,0 +1,5 @@
+# config.py
+TOKEN = "8120512236:AAGCqMsgg1k6JY8FcpqxKvCfv5NXLhd7G4Q"
+ADMIN_ID = 389473111
+FEEDBACK_CHANNEL = "@feedback_bo"
+TEST_MODE = True
