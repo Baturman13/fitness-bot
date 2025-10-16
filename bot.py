@@ -1,7 +1,6 @@
 import os
 import logging
-from telegram import Update
-from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
 # Настройка логирования
 logging.basicConfig(
@@ -9,31 +8,35 @@ logging.basicConfig(
     level=logging.INFO
 )
 
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Обработчик команды /start"""
-    await update.message.reply_text("✅ Бот работает! Фитнес-трекер запущен.")
+def start(update, context):
+    update.message.reply_text(
+        "🏋️ FitnessBot запущен!\n\n"
+        "Теперь я буду работать 24/7!\n"
+        "Пишите что вы съели, например:\n"
+        "• гречка 200г\n"
+        "• яблоко 2 шт\n"
+        "• протеин 1 ложка"
+    )
 
-async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Эхо-ответ для тестирования"""
-    await update.message.reply_text(f"Получил: {update.message.text}")
+def handle_message(update, context):
+    text = update.message.text
+    update.message.reply_text(f"✅ Записал: {text}")
 
 def main():
-    """Запуск бота"""
     token = os.getenv('TOKEN')
     if not token:
         logging.error("Токен не найден!")
         return
 
-    # Создаем приложение
-    application = Application.builder().token(token).build()
-    
-    # Добавляем обработчики
-    application.add_handler(CommandHandler("start", start))
-    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
-    
-    # Запускаем
-    logging.info("Бот запускается...")
-    application.run_polling()
+    updater = Updater(token, use_context=True)
+    dp = updater.dispatcher
+
+    dp.add_handler(CommandHandler("start", start))
+    dp.add_handler(MessageHandler(Filters.text, handle_message))
+
+    logging.info("🚀 Бот запускается...")
+    updater.start_polling()
+    updater.idle()
 
 if __name__ == '__main__':
     main()
